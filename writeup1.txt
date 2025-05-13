@@ -1,0 +1,67 @@
+Cribbage Bot Progress Report
+============================
+
+=== Match Results ===
+Total Games: 100
+ValueBot Wins: 90
+RandomBot Wins: 10
+ValueBot Win Rate: 90.00%
+
+
+Current Methodology
+-------------------
+The current version of the Cribbage bot implements the following components:
+
+1. **Core Game Engine**
+   - Card and Deck classes for standard 52-card logic
+   - A CribbageGame class that handles dealing, discarding, scoring, dealer switching, and match ending at 121 points
+   - Full scoring implementation including 15s, pairs, runs, flushes, and knobs
+
+2. **Discard Value Simulation**
+   - A simulation (`analyze_card_values.py`) was run across 5,000 hands as both dealer and non-dealer
+   - The impact of discarding each card rank was averaged across scenarios and stored in `expected_value_v1.json`
+   - This data provides a relative expected value for discarding each rank, depending on whether the bot is the dealer or not
+
+3. **Value-Based Player (ValueBot)**
+   - Uses the expected value table to choose the best discard combination from 15 possible 2-card pairs
+   - Chooses cards that maximize total discard value when dealer and minimize crib value when opponent is the dealer
+
+4. **Simulation Framework**
+   - A 100-game match between ValueBot and a baseline RandomBot was run
+   - ValueBot won 90 out of 100 games (90% win rate)
+   - The simulation tracked average score differences and win counts to benchmark performance
+
+   
+Future Improvements
+-------------------
+To enhance the Cribbage bot and move toward optimal play, the following steps are proposed:
+
+1. **Pegging Phase Implementation**
+   - Add the second phase of Cribbage: the pegging phase (play to 31)
+   - This involves turn-based card play, tracking running totals, and scoring pairs/runs on the board
+
+2. **Reinforcement Learning Integration**
+   - Replace rule-based discard logic with a trainable agent (e.g., using DQN or PPO)
+   - State space: 6-card hand (encoded) + dealer status
+   - Action space: 15 possible discard combinations
+   - Reward: hand score (+ crib score if dealer)
+
+3. **Crib Value Prediction Model**
+   - Build a lightweight crib evaluator that predicts expected crib value based on card combinations
+   - Helps improve discard decisions beyond simple rank-based averages
+
+4. **Self-Play and Tournament Mode**
+   - Enable multiple bots (value-based, random, RL-based) to play round-robin tournaments
+   - Track win rates, score differentials, and decision logs
+
+5. **Better Evaluation**
+   - Plot win rates and score differences over time
+   - Track discard decisions and crib contributions separately
+   - Compare agents not just by win rate but also by consistency and error margin
+
+6. **Web Interface or CLI Dashboard**
+   - Add a simple interface to watch games play out or to test discard decisions manually
+
+
+Prepared by: Ian Menachery
+Date: 05-12-2025
