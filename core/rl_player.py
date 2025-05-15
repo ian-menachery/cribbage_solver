@@ -11,10 +11,22 @@ class RLPlayer(Player):
 
     def discard_to_crib(self, is_dealer):
         # Format observation: 6 cards → 6x2 matrix of [rank, suit_index]
-        obs = np.array([
+        card_info = np.array([
             [card.rank, 'CDHS'.index(card.suit)]
             for card in self.hand
+        ], dtype=np.int32).flatten()
+        
+        # Add state information
+        state_info = np.array([
+            int(is_dealer),
+            self.score,
+            0,  # opponent score (not available in player)
+            52 - 14,  # cards remaining
+            0  # endgame flag
         ], dtype=np.int32)
+        
+        # Combine into full observation
+        obs = np.concatenate([card_info, state_info])
 
         # Predict discard action
         action, _ = self.model.predict(obs, deterministic=True)

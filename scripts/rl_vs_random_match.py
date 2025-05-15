@@ -5,6 +5,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from core.rl_player import RLPlayer
 from core.value_player import ValuePlayer
 from core.cribbage_game import CribbageGame
+from tqdm import tqdm
 
 class CribbageMatch:
     def __init__(self):
@@ -13,25 +14,29 @@ class CribbageMatch:
         self.score_diffs = []
 
     def run_game(self):
-        rl_bot = RLPlayer("RLBot", model_path="models/discard_dqn_agent.zip")
-        value_bot = ValuePlayer("ValueBot")
+        try:
+            rl_bot = RLPlayer("RLBot", model_path="models/discard_dqn_agent_final.zip")
+            value_bot = ValuePlayer("ValueBot")
 
-        game = CribbageGame(rl_bot, value_bot)
+            game = CribbageGame(rl_bot, value_bot)
 
-        while not game.winner:
-            game.play_round()
+            while not game.winner:
+                game.play_round()
 
-        if game.winner.name == "RLBot":
-            self.p1_wins += 1
-        else:
-            self.p2_wins += 1
+            if game.winner.name == "RLBot":
+                self.p1_wins += 1
+            else:
+                self.p2_wins += 1
 
-        diff = game.p1.score - game.p2.score
-        self.score_diffs.append(diff)
+            diff = game.p1.score - game.p2.score
+            self.score_diffs.append(diff)
+        except Exception as e:
+            print(f"Error in game: {str(e)}")
+            raise
 
     def run(self, num_games=100):
-        for i in range(num_games):
-            print(f"\n--- Game {i+1} ---")
+        print("\nStarting RL Bot vs Value Bot match...")
+        for i in tqdm(range(num_games), desc="Running games"):
             self.run_game()
 
         win_rate = self.p1_wins / num_games * 100
